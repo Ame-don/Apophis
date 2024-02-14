@@ -1,0 +1,46 @@
+from poliastro.core.iod import lambert
+from poliastro.core.elements import coe_rotation_matrix
+from poliastro.bodies import Earth, Mars
+from poliastro.twobody import Orbit
+
+def bi_elliptic_transfer(ss_earth, ss_mars):
+    # Compute departure and arrival positions
+    r1, r2 = ss_earth.r, ss_mars.r
+
+    # Compute departure and arrival velocities
+    v1, v2 = ss_earth.v, ss_mars.v
+
+    # Compute time of flight for the first leg
+    tof_1 = ss_earth.period / 2
+
+    # Compute transfer orbit for the first leg
+    ss_trans_1 = lambert(Earth.k, r1, r2, tof_1)
+
+    # Compute rotation matrix
+    rotation_matrix = coe_rotation_matrix(ss_trans_1.inc, ss_trans_1.raan, ss_trans_1.argp)
+
+    # Rotate departure and arrival velocities
+    v1_trans_1 = rotation_matrix @ v1
+    v2_trans_1 = rotation_matrix @ v2
+
+    # Compute intermediate orbit
+    ss_trans_1_2 = Orbit.from_vectors(Earth, ss_trans_1.a, v2_trans_1, ss_earth.epoch)
+
+    # Compute time of flight for the second leg
+    tof_2 = ss_trans_1_2.period / 2
+
+    # Compute transfer orbit for the second leg
+    ss_trans_2 = lambert(Earth.k, r1, r2, tof_2)
+
+    # Compute rotation matrix
+    rotation_matrix = coe_rotation_matrix(ss_trans_2.inc, ss_trans_2.raan, ss_trans_2.argp)
+
+    # Rotate departure and arrival velocities
+    v1_trans_2 = rotation_matrix @ v1
+    v2_trans_2 = rotation_matrix @ v2
+
+    # Compute departure and arrival orbits
+    ss_trans_1_1 = Orbit.from_vectors(Earth, r1, v1_trans_1, ss_earth.epoch)
+    ss_trans_2_2 = Orbit.from_vectors(Earth, r2, v2_trans_2, ss_earth.epoch)
+
+    return ss_trans_1_1, ss_trans_2_2
