@@ -1,0 +1,60 @@
+class HohmannTransfer {
+  constructor(r1, r2, mu) {
+    this.r1 = r1;
+    this.r2 = r2;
+    this.mu = mu;
+  }
+
+  getDeltaV1() {
+    const r1 = this.r1;
+    const r2 = this.r2;
+    return Math.sqrt(this.mu * (2 / r1 - 1 / r2));
+  }
+
+  getDeltaV2() {
+    const r1 = this.r1;
+    const r2 = this.r2;
+    return Math.sqrt(this.mu * (1 / r1 - 1 / r2));
+  }
+}
+
+class HyperbolicTransfer {
+  constructor(r1, r2, v1, mu) {
+    this.r1 = r1;
+    this.r2 = r2;
+    this.v1 = v1;
+    this.mu = mu;
+  }
+
+  getDeltaV1() {
+    const r1 = this.r1;
+    const v1 = this.v1;
+    const mu = this.mu;
+    return Math.sqrt(v1 ** 2 - mu * (2 / r1));
+  }
+
+  getDeltaV2() {
+    const r1 = this.r1;
+    const r2 = this.r2;
+    const v1 = this.v1;
+    const mu = this.mu;
+    const v2 = Math.sqrt(mu * (2 / r2));
+    return v2 - v1;
+  }
+}
+
+class TransferTime {
+  constructor(a1, a2, mu) {
+    this.a1 = a1;
+    this.a2 = a2;
+    this.mu = mu;
+  }
+
+  getTransferTime() {
+    const a1 = this.a1;
+    const a2 = this.a2;
+    const mu = this.mu;
+    const T = Math.PI * Math.sqrt(((a1 + a2) ** 3) / (8 * mu));
+    return T;
+  }
+}
